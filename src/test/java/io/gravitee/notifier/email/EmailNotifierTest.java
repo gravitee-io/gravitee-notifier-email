@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -34,7 +35,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -43,6 +44,7 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MailClient.class, Vertx.class})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class EmailNotifierTest {
 
     @InjectMocks
@@ -65,10 +67,11 @@ public class EmailNotifierTest {
     public void init() throws IOException {
         initMocks(this);
         setField(emailNotifier, "templatesPath", this.getClass().getResource("/io/gravitee/notifier/email/templates").getPath());
-        emailNotifier.init();
+        emailNotifier.afterPropertiesSet();
 
         mockStatic(MailClient.class);
         when(MailClient.createShared(any(), any(), any())).thenReturn(mailClient);
+
         mockStatic(Vertx.class);
         when(Vertx.currentContext()).thenReturn(context);
     }
@@ -77,7 +80,7 @@ public class EmailNotifierTest {
     public void shouldSend() throws Exception {
         when(notification.getType()).thenReturn("email");
         when(notification.getDestination()).thenReturn("to@mail.com");
-        when(mapper.readValue(anyString(), eq(EmailNotificationConfiguration.class)))
+        when(mapper.readValue(nullable(String.class), eq(EmailNotificationConfiguration.class)))
                 .thenReturn(emailNotificationConfiguration);
         when(emailNotificationConfiguration.getFrom()).thenReturn("from@mail.com");
         when(emailNotificationConfiguration.getSubject()).thenReturn("subject of email");
