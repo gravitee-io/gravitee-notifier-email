@@ -23,10 +23,8 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailMessage;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -43,7 +41,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
-@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MailClient.class, Vertx.class})
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
@@ -81,24 +78,26 @@ public class EmailNotifierTest {
 
     @Test
     public void shouldSend() throws Exception {
-        when(notification.getType()).thenReturn("email");
+        when(notification.getType()).thenReturn(EmailNotifier.TYPE);
         when(mapper.readValue(nullable(String.class), eq(EmailNotifierConfiguration.class)))
                 .thenReturn(emailNotifierConfiguration);
         when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
         when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
-        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
-        when(emailNotifierConfiguration.getBody()).thenReturn("template_sample.html");
+        when(emailNotifierConfiguration.getSubject()).thenReturn("HC KO at ${timestamp}");
+        when(emailNotifierConfiguration.getBody()).thenReturn("<#include \"template_sample.html\">");
         when(emailNotifierConfiguration.getHost()).thenReturn("smtp.host.fr");
         when(emailNotifierConfiguration.getPort()).thenReturn(587);
         when(emailNotifierConfiguration.getUsername()).thenReturn("user");
         when(emailNotifierConfiguration.getPassword()).thenReturn("password");
+
+        parameters.put("timestamp", "1615620848665");
 
         emailNotifier.send(notification, parameters);
 
         final MailMessage mailMessage = new MailMessage();
         mailMessage.setFrom("from@mail.com");
         mailMessage.setTo("to@mail.com");
-        mailMessage.setSubject("subject of email");
+        mailMessage.setSubject("HC KO at 1615620848665");
         mailMessage.setHtml(
                 "<html>\n" +
                 " <head></head>\n" +
@@ -109,7 +108,12 @@ public class EmailNotifierTest {
                 " </body>\n" +
                 "</html>"
         );
-        verify(mailClient).sendMail(eq(mailMessage), any());
+        verify(mailClient).sendMail(argThat(msg ->
+                msg.getFrom().equals(mailMessage.getFrom()) &&
+                        msg.getTo().equals(mailMessage.getTo()) &&
+                        msg.getSubject().equals(mailMessage.getSubject()) &&
+                        msg.getHtml().equals(mailMessage.getHtml())
+        ), any());
     }
 
     @Test

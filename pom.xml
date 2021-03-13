@@ -34,7 +34,7 @@
     <name>Gravitee.io APIM - Notifier - Email</name>
 
     <properties>
-        <gravitee-notifier-api.version>1.2.1</gravitee-notifier-api.version>
+        <gravitee-notifier-api.version>1.2.2-SNAPSHOT</gravitee-notifier-api.version>
         <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
         <jsoup.version>1.11.2</jsoup.version>
 

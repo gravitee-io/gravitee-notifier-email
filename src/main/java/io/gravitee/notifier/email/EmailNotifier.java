@@ -58,20 +58,26 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailNotifier.class);
 
-    private static final String TYPE = "email-notifier";
+    public static final String TYPE = "email-notifier";
 
     @Value("${notifiers.email.templates.path:${gravitee.home}/templates}")
     private String templatesPath;
 
-    private Configuration config = new Configuration(Configuration.VERSION_2_3_28);
+    private static final Configuration CONFIGURATION;
+
+    static {
+        CONFIGURATION =
+                new freemarker.template.Configuration(Configuration.VERSION_2_3_28);
+
+        CONFIGURATION.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+    }
 
     public EmailNotifier(EmailNotifierConfiguration configuration) {
-        super(TYPE, configuration);
+        super(TYPE, configuration, CONFIGURATION);
     }
 
     public void afterPropertiesSet() throws IOException {
-        config.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
-        config.setTemplateLoader(new FileTemplateLoader(new File(URLDecoder.decode(templatesPath, "UTF-8"))));
+        CONFIGURATION.setTemplateLoader(new FileTemplateLoader(new File(URLDecoder.decode(templatesPath, "UTF-8"))));
     }
 
     @Override
@@ -97,8 +103,8 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
                     .setPort(configuration.getPort())
                     .setTrustAll(configuration.isSslTrustAll());
 
-            if (configuration.getUsername() != null && ! configuration.getUsername().isEmpty() &&
-                    configuration.getPassword() != null && ! configuration.getPassword().isEmpty()) {
+            if (configuration.getUsername() != null && !configuration.getUsername().isEmpty() &&
+                    configuration.getPassword() != null && !configuration.getPassword().isEmpty()) {
                 mailConfig.setUsername(configuration.getUsername());
                 mailConfig.setPassword(configuration.getPassword());
             } else {
@@ -185,6 +191,7 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
 
     /**
      * Extract the MIME type from a base64 string
+     *
      * @param encoded Base64 string
      * @return MIME type string
      */
