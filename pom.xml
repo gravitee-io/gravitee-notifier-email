@@ -35,7 +35,7 @@
 
     <properties>
         <gravitee-bom.version>2.0</gravitee-bom.version>
-        <gravitee-notifier-api.version>1.2.1</gravitee-notifier-api.version>
+        <gravitee-notifier-api.version>1.4.1</gravitee-notifier-api.version>
         <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
         <jsoup.version>1.11.2</jsoup.version>
         <greenmail-junit5.version>1.6.5</greenmail-junit5.version>
