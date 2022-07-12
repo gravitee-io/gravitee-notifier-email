@@ -15,7 +15,11 @@
  */
 package io.gravitee.notifier.email;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -189,5 +193,103 @@ public class EmailNotifierTest {
             );
 
         Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldSendEmailWithImage() throws Exception {
+        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
+        when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
+        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
+        when(emailNotifierConfiguration.getBody()).thenReturn("<img src=\"images/email.svg\" />\n" + "<div>test</div>");
+        when(emailNotifierConfiguration.getHost()).thenReturn(ServerSetupTest.SMTP.getBindAddress());
+        when(emailNotifierConfiguration.getPort()).thenReturn(ServerSetupTest.SMTP.getPort());
+        when(emailNotifierConfiguration.getUsername()).thenReturn("user");
+        when(emailNotifierConfiguration.getPassword()).thenReturn("password");
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Vertx
+            .vertx()
+            .runOnContext(
+                new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        CompletableFuture<Void> future = emailNotifier.send(notification, parameters);
+
+                        future.whenComplete(
+                            new BiConsumer<Void, Throwable>() {
+                                @Override
+                                public void accept(Void unused, Throwable throwable) {
+                                    assertNull(throwable);
+
+                                    assertEquals(1, greenMail.getReceivedMessages().length);
+                                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+
+                                    try {
+                                        assertTrue(GreenMailUtil.getBody(receivedMessage).contains("Content-ID:"));
+                                        assertEquals(1, receivedMessage.getAllRecipients().length);
+                                        assertEquals("to@mail.com", receivedMessage.getAllRecipients()[0].toString());
+                                        assertEquals("subject of email", receivedMessage.getSubject());
+                                        latch.countDown();
+                                    } catch (Throwable t) {
+                                        fail(t);
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+
+        Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void shouldSendEmailWithInvalidImage() throws Exception {
+        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
+        when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
+        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
+        when(emailNotifierConfiguration.getBody()).thenReturn("<img src=\"../../../../../images/email.svg\" />\n" + "<div>test</div>");
+        when(emailNotifierConfiguration.getHost()).thenReturn(ServerSetupTest.SMTP.getBindAddress());
+        when(emailNotifierConfiguration.getPort()).thenReturn(ServerSetupTest.SMTP.getPort());
+        when(emailNotifierConfiguration.getUsername()).thenReturn("user");
+        when(emailNotifierConfiguration.getPassword()).thenReturn("password");
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        Vertx
+            .vertx()
+            .runOnContext(
+                new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        CompletableFuture<Void> future = emailNotifier.send(notification, parameters);
+
+                        future.whenComplete(
+                            new BiConsumer<Void, Throwable>() {
+                                @Override
+                                public void accept(Void unused, Throwable throwable) {
+                                    assertNull(throwable);
+
+                                    assertEquals(1, greenMail.getReceivedMessages().length);
+                                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+
+                                    try {
+                                        assertFalse(GreenMailUtil.getBody(receivedMessage).contains("Content-ID:"));
+                                        assertEquals(1, receivedMessage.getAllRecipients().length);
+                                        assertEquals("to@mail.com", receivedMessage.getAllRecipients()[0].toString());
+                                        assertEquals("subject of email", receivedMessage.getSubject());
+                                        latch.countDown();
+                                    } catch (Throwable t) {
+                                        fail(t);
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+
+        Assertions.assertTrue(latch.await(10, TimeUnit.MINUTES));
     }
 }
