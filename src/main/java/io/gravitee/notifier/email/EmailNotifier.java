@@ -44,8 +44,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -55,8 +53,6 @@ import org.springframework.beans.factory.annotation.Value;
  * @author GraviteeSource Team
  */
 public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierConfiguration> implements InitializingBean {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmailNotifier.class);
 
     private static final String RECIPIENTS_SPLIT_REGEX = ",|;|\\s";
 
@@ -88,16 +84,16 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
                     mailMessage,
                     e -> {
                         if (e.succeeded()) {
-                            LOGGER.debug("Email {) has been send successfully! " + e.result().getMessageID());
+                            logger.debug("Email {) has been send successfully! " + e.result().getMessageID());
                             future.complete(null);
                         } else {
-                            LOGGER.error("An error occurs while sending email", e.cause());
+                            logger.error("An error occurs while sending email", e.cause());
                             future.completeExceptionally(e.cause());
                         }
                     }
                 );
         } catch (final Exception ex) {
-            LOGGER.error("Error while sending email notification", ex);
+            logger.error("Error while sending email notification", ex);
             future.completeExceptionally(ex);
         }
         return future;
@@ -174,14 +170,21 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
                 final MailAttachment attachment = new MailAttachmentImpl();
 
                 String source = res.attr("src").trim();
+                boolean addAttachment = true;
                 if (source.startsWith("data:image/")) {
                     final String value = source.replaceFirst("^data:image/[^;]*;base64,?", "");
                     byte[] bytes = Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8));
                     attachment.setContentType(extractMimeType(source));
                     attachment.setData(buffer(bytes));
                 } else {
-                    attachment.setContentType(getContentTypeByFileName(source));
-                    attachment.setData(buffer(readAllBytes(new File(templatesPath, source).toPath())));
+                    File file = new File(templatesPath, source);
+                    if (file.getCanonicalPath().startsWith(templatesPath)) {
+                        attachment.setContentType(getContentTypeByFileName(source));
+                        attachment.setData(buffer(readAllBytes(file.toPath())));
+                    } else {
+                        logger.warn("Resource path invalid : {}", file.getPath());
+                        addAttachment = false;
+                    }
                 }
 
                 String contentId = UUID.random().toString();
@@ -189,7 +192,9 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
                 attachment.setContentId('<' + contentId + '>');
                 attachment.setDisposition("inline");
 
-                mailAttachments.add(attachment);
+                if (addAttachment) {
+                    mailAttachments.add(attachment);
+                }
             }
 
             // Attach images
