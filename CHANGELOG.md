@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.4.1...1.4.2) (2022-07-21)
+
+
+### Bug Fixes
+
+* do not include attachment if the resource path isn't on the right folder ([9581009](https://github.com/gravitee-io/gravitee-notifier-email/commit/9581009355be1741cd955a2f9ff78028f7fc4207)), closes [gravitee-io/issues#8091](https://github.com/gravitee-io/issues/issues/8091)
+
 ## [1.4.1](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.4.0...1.4.1) (2022-02-23)
 
 
