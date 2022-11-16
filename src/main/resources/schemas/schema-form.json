@@ -1,48 +1,76 @@
 {
-  "type" : "object",
-  "id" : "urn:jsonschema:io:gravitee:notifier:email:configuration:EmailNotifierConfiguration",
-  "properties" : {
-    "host" : {
+  "type": "object",
+  "id": "urn:jsonschema:io:gravitee:notifier:email:configuration:EmailNotifierConfiguration",
+  "properties": {
+    "host": {
       "title": "Host",
       "description": "SMTP Host",
-      "type" : "string"
+      "type": "string"
     },
-    "port" : {
+    "port": {
       "title": "Port",
       "description": "SMTP Port",
-      "type" : "integer"
+      "type": "integer"
     },
-    "username" : {
+    "username": {
       "title": "Username",
       "description": "SMTP Username",
-      "type" : "string"
+      "type": "string"
     },
-    "password" : {
+    "password": {
       "title": "Password",
       "description": "SMTP Password",
-      "type" : "string",
+      "type": "string",
       "widget": "password",
-      "sensitive" : true
+      "sensitive": true
     },
-    "from" : {
+    "authMethods": {
+      "title": "Allowed authentication methods",
+      "description": "Restricts authentication methods, no choice means all are authorized",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "XOAUTH2",
+          "NTLM",
+          "DIGEST-MD5",
+          "CRAM-SHA256",
+          "CRAM-SHA1",
+          "CRAM-MD5",
+          "LOGIN",
+          "PLAIN"
+        ]
+      },
+      "default": [
+        "XOAUTH2",
+        "NTLM",
+        "DIGEST-MD5",
+        "CRAM-SHA256",
+        "CRAM-SHA1",
+        "CRAM-MD5",
+        "LOGIN",
+        "PLAIN"
+      ]
+    },
+    "from": {
       "title": "From",
       "description": "Email address used as 'from' when sending email",
-      "type" : "string"
+      "type": "string"
     },
-    "to" : {
+    "to": {
       "title": "Recipients",
       "description": "The recipients of the email",
-      "type" : "string"
+      "type": "string"
     },
-    "subject" : {
+    "subject": {
       "title": "Subject",
       "description": "The subject of the email",
-      "type" : "string"
+      "type": "string"
     },
-    "body" : {
+    "body": {
       "title": "Body",
       "description": "The email payload",
-      "type" : "string",
+      "type": "string",
       "x-schema-form": {
         "type": "codemirror",
         "codemirrorOptions": {
@@ -57,26 +85,26 @@
         }
       }
     },
-    "startTLSEnabled" : {
+    "startTLSEnabled": {
       "title": "Start TLS enabled",
       "description": "SMTP server TLS activation",
-      "type" : "boolean"
+      "type": "boolean"
     },
-    "sslTrustAll" : {
+    "sslTrustAll": {
       "title": "SSL trust all",
       "description": "Email address used as 'from' when sending email",
-      "type" : "boolean"
+      "type": "boolean"
     },
-    "sslKeyStore" : {
+    "sslKeyStore": {
       "title": "SSL key store",
       "description": "Keystore path for SMTP exposition through SMTPS protocol",
-      "type" : "string"
+      "type": "string"
     },
-    "sslKeyStorePassword" : {
+    "sslKeyStorePassword": {
       "title": "SSL key store password",
       "description": "Keystore password for SMTP exposition through SMTPS protocol",
-      "type" : "string",
-      "sensitive" : true
+      "type": "string",
+      "sensitive": true
     }
   },
   "required": [

@@ -19,6 +19,8 @@ import static io.vertx.core.buffer.Buffer.buffer;
 import static io.vertx.ext.mail.MailClient.createShared;
 import static java.lang.String.valueOf;
 import static java.nio.file.Files.readAllBytes;
+import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import freemarker.cache.FileTemplateLoader;
@@ -39,6 +41,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.activation.MimetypesFileTypeMap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -78,7 +81,6 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
         try {
             final MailMessage mailMessage = prepareMailMessage(parameters);
             final MailConfig mailConfig = prepareMailConfig();
-
             createShared(Vertx.currentContext().owner(), mailConfig, valueOf(mailConfig.getHostname().hashCode()))
                 .sendMail(
                     mailMessage,
@@ -128,31 +130,45 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
             .setPort(configuration.getPort())
             .setTrustAll(configuration.isSslTrustAll());
 
-        if (
-            configuration.getUsername() != null &&
-            !configuration.getUsername().isEmpty() &&
-            configuration.getPassword() != null &&
-            !configuration.getPassword().isEmpty()
-        ) {
+        if (hasCredentials()) {
             mailConfig.setUsername(configuration.getUsername());
             mailConfig.setPassword(configuration.getPassword());
         } else {
             mailConfig.setLogin(LoginOption.DISABLED);
         }
 
-        if (configuration.getSslKeyStore() != null) {
+        if (nonNull(configuration.getSslKeyStore())) {
             mailConfig.setKeyStore(configuration.getSslKeyStore());
         }
-        if (configuration.getSslKeyStorePassword() != null) {
+        if (nonNull(configuration.getSslKeyStorePassword())) {
             mailConfig.setKeyStorePassword(configuration.getSslKeyStorePassword());
         }
+
         if (configuration.isStartTLSEnabled()) {
             mailConfig.setStarttls(StartTLSOptions.REQUIRED);
         } else {
             mailConfig.setStarttls(StartTLSOptions.DISABLED);
         }
 
+        if (hasAuthMethods()) {
+            var authMethods = configuration.getAuthMethods().stream().map(String::toUpperCase).collect(joining(" "));
+            mailConfig.setAuthMethods(authMethods);
+        }
+
         return mailConfig;
+    }
+
+    private boolean hasAuthMethods() {
+        return nonNull(configuration.getAuthMethods()) && !configuration.getAuthMethods().isEmpty();
+    }
+
+    private boolean hasCredentials() {
+        return (
+            configuration.getUsername() != null &&
+            !configuration.getUsername().isEmpty() &&
+            configuration.getPassword() != null &&
+            !configuration.getPassword().isEmpty()
+        );
     }
 
     private void addContentInMessage(final MailMessage mailMessage, final String htmlText) throws Exception {
