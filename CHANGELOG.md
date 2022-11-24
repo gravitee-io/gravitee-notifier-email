@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.4.2...1.5.0) (2022-11-24)
+
+
+### Features
+
+* handle auth methods in mail configuration ([e807232](https://github.com/gravitee-io/gravitee-notifier-email/commit/e8072324adf0b9dbcd0c63ef13ebdc41923317aa))
+
 ## [1.4.2](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.4.1...1.4.2) (2022-07-21)
 
 
