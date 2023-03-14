@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>20.0</version>
+        <version>21.0.0</version>
     </parent>
 
     <groupId>io.gravitee.notifier</groupId>
@@ -34,13 +34,18 @@
     <name>Gravitee.io APIM - Notifier - Email</name>
 
     <properties>
-        <gravitee-bom.version>2.0</gravitee-bom.version>
-        <gravitee-notifier-api.version>1.2.1</gravitee-notifier-api.version>
-        <maven-assembly-plugin.version>2.5.5</maven-assembly-plugin.version>
-        <jsoup.version>1.11.2</jsoup.version>
-        <greenmail-junit5.version>1.6.5</greenmail-junit5.version>
-        <junit-jupiter-engine.version>5.8.1</junit-jupiter-engine.version>
-        <mockito.version>3.11.2</mockito.version>
+        <gravitee-bom.version>4.0.0</gravitee-bom.version>
+        <gravitee-notifier-api.version>1.4.3</gravitee-notifier-api.version>
+        <jsoup.version>1.15.4</jsoup.version>
+        <greenmail-junit5.version>2.0.0</greenmail-junit5.version>
+        <freemarker.version>2.3.32</freemarker.version>
+        <gravitee-common.version>2.0.0</gravitee-common.version>
+        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+
+        <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
+        <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
+        <prettier-maven-plugin.version>0.19</prettier-maven-plugin.version>
+        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <json-schema-generator-maven-plugin.version>1.3.0</json-schema-generator-maven-plugin.version>
         <json-schema-generator-maven-plugin.outputDirectory>${project.build.directory}/schemas</json-schema-generator-maven-plugin.outputDirectory>
 
@@ -114,6 +119,26 @@
             <artifactId>logback-core</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.gravitee.common</groupId>
+            <artifactId>gravitee-common</artifactId>
+            <version>${gravitee-common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+            <version>${jakarta.activation.version}</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -129,28 +154,26 @@
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail-junit5</artifactId>
-            <version>1.6.5</version>
+            <version>${greenmail-junit5.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter-engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter-engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 
@@ -184,7 +207,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>${properties-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -223,10 +246,9 @@
             <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
-                <version>0.18</version>
+                <version>${prettier-maven-plugin.version}</version>
                 <configuration>
-                    <nodeVersion>12.13.0</nodeVersion>
-                    <prettierJavaVersion>1.6.1</prettierJavaVersion>
+                    <prettierJavaVersion>2.1.0</prettierJavaVersion>
                 </configuration>
                 <executions>
                     <execution>
@@ -240,14 +262,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.junit.platform</groupId>
-                        <artifactId>junit-platform-surefire-provider</artifactId>
-                        <version>1.3.2</version>
-                    </dependency>
-                </dependencies>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
         </plugins>
     </build>
