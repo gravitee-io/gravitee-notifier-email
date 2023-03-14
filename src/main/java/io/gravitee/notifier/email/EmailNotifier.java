@@ -33,6 +33,7 @@ import io.gravitee.notifier.email.configuration.EmailNotifierConfiguration;
 import io.vertx.core.Vertx;
 import io.vertx.ext.mail.*;
 import io.vertx.ext.mail.impl.MailAttachmentImpl;
+import jakarta.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -41,8 +42,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.activation.MimetypesFileTypeMap;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -64,7 +63,7 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
     @Value("${notifiers.email.templates.path:${gravitee.home}/templates}")
     private String templatesPath;
 
-    private final Configuration config = new Configuration(Configuration.VERSION_2_3_28);
+    private final Configuration config = new Configuration(Configuration.VERSION_2_3_32);
 
     public EmailNotifier(EmailNotifierConfiguration configuration) {
         super(TYPE, configuration);
