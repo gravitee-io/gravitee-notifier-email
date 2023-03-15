@@ -15,8 +15,9 @@
  */
 package io.gravitee.notifier.email;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
@@ -25,23 +26,17 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import io.gravitee.notifier.api.Notification;
 import io.gravitee.notifier.email.configuration.EmailNotifierConfiguration;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -49,15 +44,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author GraviteeSource Team
  */
 @ExtendWith(MockitoExtension.class)
-public class EmailNotifierAuthenticationTest {
+class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
 
     private EmailNotifier emailNotifier;
 
-    @Mock
-    private Notification notification;
+    private final Notification notification = new Notification();
 
-    @Mock
-    private EmailNotifierConfiguration emailNotifierConfiguration;
+    private final EmailNotifierConfiguration emailNotifierConfiguration = new EmailNotifierConfiguration();
 
     private final Map<String, Object> parameters = new HashMap<>();
 
@@ -67,146 +60,98 @@ public class EmailNotifierAuthenticationTest {
         .withPerMethodLifecycle(true);
 
     @BeforeEach
-    public void init() throws IOException {
+    public void setUp() throws IOException {
+        super.setUp();
+
         emailNotifier = new EmailNotifier(emailNotifierConfiguration);
 
-        when(notification.getType()).thenReturn(EmailNotifier.TYPE);
+        emailNotifierConfiguration.setFrom("from@mail.com");
+        emailNotifierConfiguration.setTo("to@mail.com");
+        emailNotifierConfiguration.setSubject("subject of email");
+        emailNotifierConfiguration.setBody("template_sample.html");
+        emailNotifierConfiguration.setHost(ServerSetupTest.SMTP.getBindAddress());
+        emailNotifierConfiguration.setPort(ServerSetupTest.SMTP.getPort());
+        emailNotifierConfiguration.setUsername("user");
+        emailNotifierConfiguration.setPassword("password");
+
+        notification.setType(EmailNotifier.TYPE);
         setField(emailNotifier, "templatesPath", this.getClass().getResource("/io/gravitee/notifier/email/templates").getPath());
         emailNotifier.afterPropertiesSet();
     }
 
     @Test
-    public void shouldSendEmailWithCredentials() throws Exception {
-        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
-        when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
-        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
-        when(emailNotifierConfiguration.getBody()).thenReturn("template_sample.html");
-        when(emailNotifierConfiguration.getHost()).thenReturn(ServerSetupTest.SMTP.getBindAddress());
-        when(emailNotifierConfiguration.getPort()).thenReturn(ServerSetupTest.SMTP.getPort());
-        when(emailNotifierConfiguration.getUsername()).thenReturn("user");
-        when(emailNotifierConfiguration.getPassword()).thenReturn("password");
-
-        CountDownLatch latch = new CountDownLatch(1);
-
+    void shouldSendEmailWithCredentials() throws Exception {
         Vertx
             .vertx()
-            .runOnContext(
-                new Handler<Void>() {
-                    @Override
-                    public void handle(Void event) {
-                        CompletableFuture<Void> future = emailNotifier.send(notification, parameters);
+            .runOnContext(event -> {
+                emailNotifier
+                    .send(notification, parameters)
+                    .whenComplete((unused, throwable) -> {
+                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        future.whenComplete(
-                            new BiConsumer<Void, Throwable>() {
-                                @Override
-                                public void accept(Void unused, Throwable throwable) {
-                                    assertNull(throwable);
+                        try {
+                            assertThat(GreenMailUtil.getBody(receivedMessage))
+                                .isEqualTo("<html>\r\n <head></head>\r\n <body>\r\n  template_sample.html\r\n </body>\r\n</html>");
+                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                            assertThat(receivedMessage.getSubject()).hasToString("subject of email");
+                            assertEquals("subject of email", receivedMessage.getSubject());
+                        } catch (MessagingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .whenComplete(completeOrFailNow());
+            });
 
-                                    assertEquals(1, greenMail.getReceivedMessages().length);
-                                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
-
-                                    try {
-                                        assertEquals(
-                                            "<html>\r\n" +
-                                            " <head></head>\r\n" +
-                                            " <body>\r\n" +
-                                            "  template_sample.html\r\n" +
-                                            " </body>\r\n" +
-                                            "</html>",
-                                            GreenMailUtil.getBody(receivedMessage)
-                                        );
-                                        assertEquals(1, receivedMessage.getAllRecipients().length);
-                                        assertEquals("to@mail.com", receivedMessage.getAllRecipients()[0].toString());
-                                        //TODO: check why the sender is always null
-                                        //    assertEquals("from@mail.com", receivedMessage.getSender().toString());
-                                        assertEquals("subject of email", receivedMessage.getSubject());
-                                        latch.countDown();
-                                    } catch (Throwable t) {
-                                        fail(t);
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }
-            );
-
-        Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+        awaitCompletionAndCheckFailure();
     }
 
     @Test
-    public void shouldNotSendEmailWithInvalidCredentials() throws Exception {
-        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
-        when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
-        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
-        when(emailNotifierConfiguration.getBody()).thenReturn("template_sample.html");
-        when(emailNotifierConfiguration.getHost()).thenReturn(ServerSetupTest.SMTP.getBindAddress());
-        when(emailNotifierConfiguration.getPort()).thenReturn(ServerSetupTest.SMTP.getPort());
-        when(emailNotifierConfiguration.getUsername()).thenReturn("user");
-        when(emailNotifierConfiguration.getPassword()).thenReturn("bad-password");
-
-        CountDownLatch latch = new CountDownLatch(1);
+    void shouldNotSendEmailWithInvalidCredentials() {
+        emailNotifierConfiguration.setUsername("user");
+        emailNotifierConfiguration.setPassword("bad-password");
 
         Vertx
             .vertx()
-            .runOnContext(
-                new Handler<Void>() {
-                    @Override
-                    public void handle(Void event) {
-                        CompletableFuture<Void> future = emailNotifier.send(notification, parameters);
+            .runOnContext(event -> {
+                emailNotifier
+                    .send(notification, parameters)
+                    .whenComplete((unused, throwable) -> {
+                        assertThat(throwable).isNotNull();
+                        assertThat(greenMail.getReceivedMessages()).isEmpty();
+                        testContext.completeNow();
+                    })
+                    .whenComplete(completeOrFailNow());
+            });
 
-                        future.whenComplete(
-                            new BiConsumer<Void, Throwable>() {
-                                @Override
-                                public void accept(Void unused, Throwable throwable) {
-                                    assertNotNull(throwable);
-                                    assertEquals(0, greenMail.getReceivedMessages().length);
-                                    latch.countDown();
-                                }
-                            }
-                        );
-                    }
-                }
-            );
-
-        Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+        awaitCompletionAndCheckFailure();
     }
 
     @Test
-    @Disabled("GreenMail supports correctly authentication mechanism ?")
-    public void shouldNotSendEmailWithoutCredentials() throws Exception {
-        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
-        when(emailNotifierConfiguration.getTo()).thenReturn("to@mail.com");
-        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
-        when(emailNotifierConfiguration.getBody()).thenReturn("template_sample.html");
-        when(emailNotifierConfiguration.getHost()).thenReturn(ServerSetupTest.SMTP.getBindAddress());
-        when(emailNotifierConfiguration.getPort()).thenReturn(ServerSetupTest.SMTP.getPort());
-
-        CountDownLatch latch = new CountDownLatch(1);
+    @Disabled("No exception when no credentials are passed to mail server")
+    /*
+     * From GreenMail documentation:
+     * By default GreenMail accepts all incoming emails. If there is no corresponding existing email account,
+     * one is automatically created with login and password being the same as the to-address.
+     */
+    void shouldNotSendEmailWithoutCredentials() throws Exception {
+        emailNotifierConfiguration.setUsername(null);
+        emailNotifierConfiguration.setPassword(null);
 
         Vertx
             .vertx()
-            .runOnContext(
-                new Handler<Void>() {
-                    @Override
-                    public void handle(Void event) {
-                        CompletableFuture<Void> future = emailNotifier.send(notification, parameters);
+            .runOnContext(event -> {
+                emailNotifier
+                    .send(notification, parameters)
+                    .whenComplete((unused, throwable) -> {
+                        assertNotNull(throwable);
+                        assertEquals(0, greenMail.getReceivedMessages().length);
+                        testContext.completeNow();
+                    })
+                    .whenComplete(completeOrFailNow());
+            });
 
-                        future.whenComplete(
-                            new BiConsumer<Void, Throwable>() {
-                                @Override
-                                public void accept(Void unused, Throwable throwable) {
-                                    // No exception when no credentials are passed to mail server
-                                    //    assertNotNull(throwable);
-                                    assertEquals(0, greenMail.getReceivedMessages().length);
-                                    latch.countDown();
-                                }
-                            }
-                        );
-                    }
-                }
-            );
-
-        Assertions.assertTrue(latch.await(10, TimeUnit.SECONDS));
+        awaitCompletionAndCheckFailure();
     }
 }

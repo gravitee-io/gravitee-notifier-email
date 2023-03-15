@@ -106,6 +106,10 @@ public class EmailNotifierConfiguration implements NotifierConfiguration, Serial
         return body;
     }
 
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public boolean isStartTLSEnabled() {
         return startTLSEnabled;
     }

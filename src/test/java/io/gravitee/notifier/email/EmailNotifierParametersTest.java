@@ -15,6 +15,7 @@
  */
 package io.gravitee.notifier.email;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -35,17 +36,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author GraviteeSource Team
  */
 @ExtendWith(MockitoExtension.class)
-public class EmailNotifierParametersTest {
+class EmailNotifierParametersTest {
 
     private EmailNotifier emailNotifier;
 
-    @Mock
-    private Notification notification;
-
-    @Mock
-    private EmailNotifierConfiguration emailNotifierConfiguration;
-
-    private final Map<String, Object> parameters = new HashMap<>();
+    private final EmailNotifierConfiguration emailNotifierConfiguration = new EmailNotifierConfiguration();
 
     @BeforeEach
     public void init() throws IOException {
@@ -55,11 +50,11 @@ public class EmailNotifierParametersTest {
     }
 
     @Test
-    public void shouldSendEmailToSingleRecipient() throws Exception {
-        when(emailNotifierConfiguration.getFrom()).thenReturn("from@mail.com");
-        when(emailNotifierConfiguration.getTo()).thenReturn("${(entity.metadata['emails'])}");
-        when(emailNotifierConfiguration.getSubject()).thenReturn("subject of email");
-        when(emailNotifierConfiguration.getBody()).thenReturn("template_sample.html");
+    void shouldSendEmailToSingleRecipient() throws Exception {
+        emailNotifierConfiguration.setFrom("from@mail.com");
+        emailNotifierConfiguration.setTo("${(entity.metadata['emails'])}");
+        emailNotifierConfiguration.setSubject("subject of email");
+        emailNotifierConfiguration.setBody("template_sample.html");
 
         Entity entity = new Entity();
         entity.getMetadata().put("emails", "john.doe@gmail.com,jane.doe@gmail.com");
@@ -69,7 +64,7 @@ public class EmailNotifierParametersTest {
 
         MailMessage mailMessage = emailNotifier.prepareMailMessage(parameters);
 
-        Assertions.assertEquals(2, mailMessage.getTo().size());
+        assertThat(mailMessage.getTo()).hasSize(2);
     }
 
     public class Entity {
