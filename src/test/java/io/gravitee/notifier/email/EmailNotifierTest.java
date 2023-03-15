@@ -16,6 +16,9 @@
 package io.gravitee.notifier.email;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.when;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -29,7 +32,12 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -183,6 +191,46 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             assertThat(GreenMailUtil.getBody(receivedMessage)).doesNotContain("Content-ID:");
                             assertThat(receivedMessage.getAllRecipients()).hasSize(1);
 
+                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                        } catch (MessagingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .whenComplete(completeOrFailNow());
+            });
+
+        awaitCompletionAndCheckFailure();
+    }
+
+    @Test
+    @DisplayName("Should send email with new line identifier converted to <br>")
+    void shouldSendEmailWithNewLine() throws Exception {
+        emailNotifierConfiguration.setBody("A test \n with \n new \n line\n");
+
+        Vertx
+            .vertx()
+            .runOnContext(event -> {
+                emailNotifier
+                    .send(notification, parameters)
+                    .whenComplete((unused, throwable) -> {
+                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+
+                        try {
+                            assertThat(GreenMailUtil.getBody(receivedMessage))
+                                .isEqualTo(
+                                    "<html>\r\n" +
+                                    " <head></head>\r\n" +
+                                    " <body>\r\n" +
+                                    "  A test <br>\r\n" +
+                                    "   with <br>\r\n" +
+                                    "   new <br>\r\n" +
+                                    "   line<br>\r\n" +
+                                    " </body>\r\n" +
+                                    "</html>"
+                                );
+                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
                             assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
                             assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
                         } catch (MessagingException e) {
