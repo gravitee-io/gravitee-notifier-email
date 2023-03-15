@@ -118,7 +118,12 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
             .setTo(Arrays.stream(recipients.split(RECIPIENTS_SPLIT_REGEX)).collect(toList()));
 
         mailMessage.setSubject(templatize(configuration.getSubject(), parameters));
-        addContentInMessage(mailMessage, templatize(configuration.getBody(), parameters));
+        String body = configuration
+            .getBody()
+            // Replace `\n` with <br> tags
+            .replace("\n", "<br>");
+
+        addContentInMessage(mailMessage, templatize(body, parameters));
 
         return mailMessage;
     }
