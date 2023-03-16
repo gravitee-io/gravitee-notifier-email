@@ -1,3 +1,11 @@
+## [1.5.1](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.0...1.5.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* bump all dependencies ([9c82627](https://github.com/gravitee-io/gravitee-notifier-email/commit/9c82627a6e9d765d7abbc4ba37a3c15fb8ded28a))
+* convert new line `\n` to `<br>`` tag to have it displayed in html email ([439b66c](https://github.com/gravitee-io/gravitee-notifier-email/commit/439b66ce2e22717dde6569ed484d5a2c8b91a637))
+
 # [1.5.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.4.2...1.5.0) (2022-11-24)
 
 
