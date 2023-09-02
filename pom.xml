@@ -39,7 +39,7 @@
         <jsoup.version>1.15.4</jsoup.version>
         <greenmail-junit5.version>2.0.0</greenmail-junit5.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <gravitee-common.version>2.0.0</gravitee-common.version>
+        <gravitee-common.version>2.3.0</gravitee-common.version>
         <jakarta.activation.version>2.0.1</jakarta.activation.version>
 
         <maven-assembly-plugin.version>3.5.0</maven-assembly-plugin.version>
