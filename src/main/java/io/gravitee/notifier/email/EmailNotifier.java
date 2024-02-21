@@ -85,7 +85,7 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
                     mailMessage,
                     e -> {
                         if (e.succeeded()) {
-                            logger.debug("Email {) has been send successfully! " + e.result().getMessageID());
+                            logger.debug("Email {} has been send successfully!", e.result().getMessageID());
                             future.complete(null);
                         } else {
                             logger.error("An error occurs while sending email", e.cause());
