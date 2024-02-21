@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.1...1.5.2) (2024-02-21)
+
+
+### Bug Fixes
+
+* update log trace to remove typo and make information available ([bf7066c](https://github.com/gravitee-io/gravitee-notifier-email/commit/bf7066c9e00cc938332b2c336bf1969b042273f6))
+
 ## [1.5.1](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.0...1.5.1) (2023-03-16)
 
 
