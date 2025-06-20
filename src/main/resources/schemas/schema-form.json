@@ -1,118 +1,93 @@
 {
-  "type": "object",
-  "id": "urn:jsonschema:io:gravitee:notifier:email:configuration:EmailNotifierConfiguration",
-  "properties": {
-    "host": {
-      "title": "Host",
-      "description": "SMTP Host",
-      "type": "string"
-    },
-    "port": {
-      "title": "Port",
-      "description": "SMTP Port",
-      "type": "integer"
-    },
-    "username": {
-      "title": "Username",
-      "description": "SMTP Username",
-      "type": "string"
-    },
-    "password": {
-      "title": "Password",
-      "description": "SMTP Password",
-      "type": "string",
-      "widget": "password",
-      "sensitive": true
-    },
-    "authMethods": {
-      "title": "Allowed authentication methods",
-      "description": "Restricts authentication methods, no choice means all are authorized",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "XOAUTH2",
-          "NTLM",
-          "DIGEST-MD5",
-          "CRAM-SHA256",
-          "CRAM-SHA1",
-          "CRAM-MD5",
-          "LOGIN",
-          "PLAIN"
-        ]
-      },
-      "default": [
-        "XOAUTH2",
-        "NTLM",
-        "DIGEST-MD5",
-        "CRAM-SHA256",
-        "CRAM-SHA1",
-        "CRAM-MD5",
-        "LOGIN",
-        "PLAIN"
-      ]
-    },
-    "from": {
-      "title": "From",
-      "description": "Email address used as 'from' when sending email",
-      "type": "string"
-    },
-    "to": {
-      "title": "Recipients",
-      "description": "The recipients of the email",
-      "type": "string"
-    },
-    "subject": {
-      "title": "Subject",
-      "description": "The subject of the email",
-      "type": "string"
-    },
-    "body": {
-      "title": "Body",
-      "description": "The email payload",
-      "type": "string",
-      "x-schema-form": {
-        "type": "codemirror",
-        "codemirrorOptions": {
-          "placeholder": "Put the content of the email here...",
-          "lineWrapping": true,
-          "lineNumbers": true,
-          "allowDropFileTypes": true,
-          "autoCloseTags": true,
-          "mode": {
-            "name": "html"
-          }
+    "type": "object",
+    "id": "urn:jsonschema:io:gravitee:notifier:email:configuration:EmailNotifierConfiguration",
+    "properties": {
+        "host": {
+            "title": "Host",
+            "description": "SMTP Host",
+            "type": "string"
+        },
+        "port": {
+            "title": "Port",
+            "description": "SMTP Port",
+            "type": "integer"
+        },
+        "username": {
+            "title": "Username",
+            "description": "SMTP Username",
+            "type": "string"
+        },
+        "password": {
+            "title": "Password",
+            "description": "SMTP Password",
+            "type": "string",
+            "widget": "password",
+            "sensitive": true
+        },
+        "authMethods": {
+            "title": "Allowed authentication methods",
+            "description": "Restricts authentication methods, no choice means all are authorized",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["XOAUTH2", "NTLM", "DIGEST-MD5", "CRAM-SHA256", "CRAM-SHA1", "CRAM-MD5", "LOGIN", "PLAIN"]
+            },
+            "default": ["XOAUTH2", "NTLM", "DIGEST-MD5", "CRAM-SHA256", "CRAM-SHA1", "CRAM-MD5", "LOGIN", "PLAIN"]
+        },
+        "from": {
+            "title": "From",
+            "description": "Email address used as 'from' when sending email",
+            "type": "string"
+        },
+        "to": {
+            "title": "Recipients",
+            "description": "The recipients of the email",
+            "type": "string"
+        },
+        "subject": {
+            "title": "Subject",
+            "description": "The subject of the email",
+            "type": "string"
+        },
+        "body": {
+            "title": "Body",
+            "description": "The email payload",
+            "type": "string",
+            "x-schema-form": {
+                "type": "codemirror",
+                "codemirrorOptions": {
+                    "placeholder": "Put the content of the email here...",
+                    "lineWrapping": true,
+                    "lineNumbers": true,
+                    "allowDropFileTypes": true,
+                    "autoCloseTags": true,
+                    "mode": {
+                        "name": "html"
+                    }
+                }
+            }
+        },
+        "startTLSEnabled": {
+            "title": "Start TLS enabled",
+            "description": "SMTP server TLS activation",
+            "type": "boolean"
+        },
+        "sslTrustAll": {
+            "title": "SSL trust all",
+            "description": "Email address used as 'from' when sending email",
+            "type": "boolean"
+        },
+        "sslKeyStore": {
+            "title": "SSL key store",
+            "description": "Keystore path for SMTP exposition through SMTPS protocol",
+            "type": "string"
+        },
+        "sslKeyStorePassword": {
+            "title": "SSL key store password",
+            "description": "Keystore password for SMTP exposition through SMTPS protocol",
+            "type": "string",
+            "sensitive": true
         }
-      }
     },
-    "startTLSEnabled": {
-      "title": "Start TLS enabled",
-      "description": "SMTP server TLS activation",
-      "type": "boolean"
-    },
-    "sslTrustAll": {
-      "title": "SSL trust all",
-      "description": "Email address used as 'from' when sending email",
-      "type": "boolean"
-    },
-    "sslKeyStore": {
-      "title": "SSL key store",
-      "description": "Keystore path for SMTP exposition through SMTPS protocol",
-      "type": "string"
-    },
-    "sslKeyStorePassword": {
-      "title": "SSL key store password",
-      "description": "Keystore password for SMTP exposition through SMTPS protocol",
-      "type": "string",
-      "sensitive": true
-    }
-  },
-  "required": [
-    "host",
-    "port",
-    "from",
-    "to",
-    "subject",
-    "body"
-  ]
+    "required": ["host", "port", "from", "to", "subject", "body"]
 }
