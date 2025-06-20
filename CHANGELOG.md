@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.2...2.0.0) (2025-06-20)
+
+
+### Bug Fixes
+
+* upgrade gravitee dependencies ([acaddf5](https://github.com/gravitee-io/gravitee-notifier-email/commit/acaddf5e58abce2fcfd0efe7770041b5b09f8757))
+
+
+### BREAKING CHANGES
+
+* this plugin now requires java 21
+
 ## [1.5.2](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.1...1.5.2) (2024-02-21)
 
 
