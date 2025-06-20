@@ -1,11 +1,11 @@
-/**
- * Copyright (C) 2015 The Gravitee team (http://gravitee.io)
+/*
+ * Copyright © 2015 The Gravitee team (http://gravitee.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -92,7 +92,7 @@ class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
 
                         try {
                             assertThat(GreenMailUtil.getBody(receivedMessage))
-                                .isEqualTo("<html>\r\n <head></head>\r\n <body>\r\n  template_sample.html\r\n </body>\r\n</html>");
+                                .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
                             assertThat(receivedMessage.getAllRecipients()).hasSize(1);
                             assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
                             assertThat(receivedMessage.getSubject()).hasToString("subject of email");

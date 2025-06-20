@@ -1,11 +1,11 @@
-/**
- * Copyright (C) 2015 The Gravitee team (http://gravitee.io)
+/*
+ * Copyright © 2015 The Gravitee team (http://gravitee.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,9 +16,6 @@
 package io.gravitee.notifier.email;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
 
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
@@ -32,10 +29,6 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,7 +80,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
     void shouldSendEmailToSingleRecipient() {
         Vertx
             .vertx()
-            .runOnContext(event -> {
+            .runOnContext(event ->
                 emailNotifier
                     .send(notification, parameters)
                     .whenComplete((unused, throwable) -> {
@@ -96,7 +89,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                         MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
                         assertThat(GreenMailUtil.getBody(receivedMessage))
-                            .isEqualTo("<html>\r\n <head></head>\r\n <body>\r\n  template_sample.html\r\n </body>\r\n</html>");
+                            .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
 
                         try {
                             assertThat(receivedMessage.getAllRecipients()).hasSize(1);
@@ -108,8 +101,8 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             throw new RuntimeException(e);
                         }
                     })
-                    .whenComplete(completeOrFailNow());
-            });
+                    .whenComplete(completeOrFailNow())
+            );
 
         awaitCompletionAndCheckFailure();
     }
@@ -120,7 +113,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
 
         Vertx
             .vertx()
-            .runOnContext(event -> {
+            .runOnContext(event ->
                 emailNotifier
                     .send(notification, parameters)
                     .whenComplete((unused, throwable) -> {
@@ -128,7 +121,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                         MimeMessage receivedMessage = greenMail.getReceivedMessages()[1];
 
                         assertThat(GreenMailUtil.getBody(receivedMessage))
-                            .isEqualTo("<html>\r\n <head></head>\r\n <body>\r\n  template_sample.html\r\n </body>\r\n</html>");
+                            .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
                         try {
                             assertThat(receivedMessage.getAllRecipients()).hasSize(2);
                             assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
@@ -140,8 +133,8 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             throw new RuntimeException(e);
                         }
                     })
-                    .whenComplete(completeOrFailNow());
-            });
+                    .whenComplete(completeOrFailNow())
+            );
 
         awaitCompletionAndCheckFailure();
     }
@@ -152,7 +145,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
 
         Vertx
             .vertx()
-            .runOnContext(event -> {
+            .runOnContext(event ->
                 emailNotifier
                     .send(notification, parameters)
                     .whenComplete((unused, throwable) -> {
@@ -168,8 +161,8 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             throw new RuntimeException(e);
                         }
                     })
-                    .whenComplete(completeOrFailNow());
-            });
+                    .whenComplete(completeOrFailNow())
+            );
 
         awaitCompletionAndCheckFailure();
     }
@@ -180,7 +173,7 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
 
         Vertx
             .vertx()
-            .runOnContext(event -> {
+            .runOnContext(event ->
                 emailNotifier
                     .send(notification, parameters)
                     .whenComplete((unused, throwable) -> {
@@ -197,20 +190,20 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             throw new RuntimeException(e);
                         }
                     })
-                    .whenComplete(completeOrFailNow());
-            });
+                    .whenComplete(completeOrFailNow())
+            );
 
         awaitCompletionAndCheckFailure();
     }
 
     @Test
     @DisplayName("Should send email with new line identifier converted to <br>")
-    void shouldSendEmailWithNewLine() throws Exception {
+    void shouldSendEmailWithNewLine() {
         emailNotifierConfiguration.setBody("A test \n with \n new \n line\n");
 
         Vertx
             .vertx()
-            .runOnContext(event -> {
+            .runOnContext(event ->
                 emailNotifier
                     .send(notification, parameters)
                     .whenComplete((unused, throwable) -> {
@@ -220,15 +213,20 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                         try {
                             assertThat(GreenMailUtil.getBody(receivedMessage))
                                 .isEqualTo(
-                                    "<html>\r\n" +
-                                    " <head></head>\r\n" +
-                                    " <body>\r\n" +
-                                    "  A test <br>\r\n" +
-                                    "   with <br>\r\n" +
-                                    "   new <br>\r\n" +
-                                    "   line<br>\r\n" +
-                                    " </body>\r\n" +
-                                    "</html>"
+                                    """
+                                            <html>\r
+                                             <head></head>\r
+                                             <body>\r
+                                              A test\r
+                                              <br>\r
+                                              with\r
+                                              <br>\r
+                                              new\r
+                                              <br>\r
+                                              line\r
+                                              <br>\r
+                                             </body>\r
+                                            </html>"""
                                 );
                             assertThat(receivedMessage.getAllRecipients()).hasSize(1);
                             assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
@@ -237,8 +235,8 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
                             throw new RuntimeException(e);
                         }
                     })
-                    .whenComplete(completeOrFailNow());
-            });
+                    .whenComplete(completeOrFailNow())
+            );
 
         awaitCompletionAndCheckFailure();
     }
