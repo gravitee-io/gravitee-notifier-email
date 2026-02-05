@@ -81,28 +81,27 @@ class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
 
     @Test
     void shouldSendEmailWithCredentials() throws Exception {
-        Vertx
-            .vertx()
-            .runOnContext(event -> {
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        Vertx.vertx().runOnContext(event -> {
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        try {
-                            assertThat(GreenMailUtil.getBody(receivedMessage))
-                                .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            assertThat(receivedMessage.getSubject()).hasToString("subject of email");
-                            assertEquals("subject of email", receivedMessage.getSubject());
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow());
-            });
+                    try {
+                        assertThat(GreenMailUtil.getBody(receivedMessage)).isEqualTo(
+                            "<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>"
+                        );
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        assertThat(receivedMessage.getSubject()).hasToString("subject of email");
+                        assertEquals("subject of email", receivedMessage.getSubject());
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow());
+        });
 
         awaitCompletionAndCheckFailure();
     }
@@ -112,18 +111,16 @@ class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
         emailNotifierConfiguration.setUsername("user");
         emailNotifierConfiguration.setPassword("bad-password");
 
-        Vertx
-            .vertx()
-            .runOnContext(event -> {
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(throwable).isNotNull();
-                        assertThat(greenMail.getReceivedMessages()).isEmpty();
-                        testContext.completeNow();
-                    })
-                    .whenComplete(completeOrFailNow());
-            });
+        Vertx.vertx().runOnContext(event -> {
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(throwable).isNotNull();
+                    assertThat(greenMail.getReceivedMessages()).isEmpty();
+                    testContext.completeNow();
+                })
+                .whenComplete(completeOrFailNow());
+        });
 
         awaitCompletionAndCheckFailure();
     }
@@ -139,18 +136,16 @@ class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
         emailNotifierConfiguration.setUsername(null);
         emailNotifierConfiguration.setPassword(null);
 
-        Vertx
-            .vertx()
-            .runOnContext(event -> {
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertNotNull(throwable);
-                        assertEquals(0, greenMail.getReceivedMessages().length);
-                        testContext.completeNow();
-                    })
-                    .whenComplete(completeOrFailNow());
-            });
+        Vertx.vertx().runOnContext(event -> {
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertNotNull(throwable);
+                    assertEquals(0, greenMail.getReceivedMessages().length);
+                    testContext.completeNow();
+                })
+                .whenComplete(completeOrFailNow());
+        });
 
         awaitCompletionAndCheckFailure();
     }
