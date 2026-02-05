@@ -24,27 +24,26 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>23.2.1</version>
+        <version>23.5.0</version>
     </parent>
 
     <groupId>io.gravitee.notifier</groupId>
     <artifactId>gravitee-notifier-email</artifactId>
-    <version>2.0.0</version>
+    <version>3.0.0-next-version-SNAPSHOT</version>
 
     <name>Gravitee.io APIM - Notifier - Email</name>
 
     <properties>
-        <gravitee-bom.version>8.3.14</gravitee-bom.version>
-        <gravitee-notifier-api.version>1.4.3</gravitee-notifier-api.version>
-        <jsoup.version>1.20.1</jsoup.version>
-        <greenmail-junit5.version>2.1.3</greenmail-junit5.version>
-        <freemarker.version>2.3.34</freemarker.version>
-        <gravitee-common.version>4.7.0</gravitee-common.version>
-        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+        <gravitee-bom.version>8.3.47</gravitee-bom.version>
+        <gravitee-common.version>4.9.0</gravitee-common.version>
+        <gravitee-notifier-api.version>2.0.0-alpha.1</gravitee-notifier-api.version>
 
-        <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
-        <json-schema-generator-maven-plugin.version>1.3.0</json-schema-generator-maven-plugin.version>
-        <json-schema-generator-maven-plugin.outputDirectory>${project.build.directory}/schemas</json-schema-generator-maven-plugin.outputDirectory>
+        <freemarker.version>2.3.34</freemarker.version>
+        <greenmail-junit5.version>2.1.8</greenmail-junit5.version>
+        <jakarta.activation.version>2.0.1</jakarta.activation.version>
+        <jsoup.version>1.22.1</jsoup.version>
+
+        <properties-maven-plugin.version>1.3.0</properties-maven-plugin.version>
 
         <!-- Property used by the publication job in CI-->
         <publish-folder-path>plugins/notifiers</publish-folder-path>
@@ -64,6 +63,13 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.gravitee.common</groupId>
+            <artifactId>gravitee-common</artifactId>
+            <version>${gravitee-common.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>io.gravitee.notifier</groupId>
             <artifactId>gravitee-notifier-api</artifactId>
@@ -106,11 +112,13 @@
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
@@ -122,12 +130,6 @@
             <artifactId>freemarker</artifactId>
             <version>${freemarker.version}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.gravitee.common</groupId>
-            <artifactId>gravitee-common</artifactId>
-            <version>${gravitee-common.version}</version>
         </dependency>
 
         <dependency>
@@ -193,25 +195,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>io.gravitee.maven.plugins</groupId>
-                <artifactId>json-schema-generator-maven-plugin</artifactId>
-                <version>${json-schema-generator-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>generate-json-schemas</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>io/gravitee/notifier/email/configuration/EmailNotifierConfiguration.class</include>
-                            </includes>
-                            <outputDirectory>${json-schema-generator-maven-plugin.outputDirectory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>${properties-maven-plugin.version}</version>
@@ -248,10 +231,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

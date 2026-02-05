@@ -78,31 +78,30 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
 
     @Test
     void shouldSendEmailToSingleRecipient() {
-        Vertx
-            .vertx()
-            .runOnContext(event ->
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
+        Vertx.vertx().runOnContext(event ->
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(1);
 
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        assertThat(GreenMailUtil.getBody(receivedMessage))
-                            .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
+                    assertThat(GreenMailUtil.getBody(receivedMessage)).isEqualTo(
+                        "<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>"
+                    );
 
-                        try {
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            //TODO: check why the sender is always null
-                            // assertThat(receivedMessage.getSender()).hasToString("from@mail.com");
-                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow())
-            );
+                    try {
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        //TODO: check why the sender is always null
+                        // assertThat(receivedMessage.getSender()).hasToString("from@mail.com");
+                        assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow())
+        );
 
         awaitCompletionAndCheckFailure();
     }
@@ -111,30 +110,29 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
     void shouldSendEmailToMultipleRecipients() {
         emailNotifierConfiguration.setTo("to@mail.com,to2@mail.com");
 
-        Vertx
-            .vertx()
-            .runOnContext(event ->
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(2);
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[1];
+        Vertx.vertx().runOnContext(event ->
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(2);
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[1];
 
-                        assertThat(GreenMailUtil.getBody(receivedMessage))
-                            .isEqualTo("<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>");
-                        try {
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(2);
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            assertThat(receivedMessage.getAllRecipients()[1]).hasToString("to2@mail.com");
-                            //TODO: check why the sender is always null
-                            //    assertEquals("from@mail.com", receivedMessage.getSender().toString());
-                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow())
-            );
+                    assertThat(GreenMailUtil.getBody(receivedMessage)).isEqualTo(
+                        "<html>\r\n <head></head>\r\n <body>template_sample.html</body>\r\n</html>"
+                    );
+                    try {
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(2);
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        assertThat(receivedMessage.getAllRecipients()[1]).hasToString("to2@mail.com");
+                        //TODO: check why the sender is always null
+                        //    assertEquals("from@mail.com", receivedMessage.getSender().toString());
+                        assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow())
+        );
 
         awaitCompletionAndCheckFailure();
     }
@@ -143,26 +141,24 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
     void shouldSendEmailWithImage() {
         emailNotifierConfiguration.setBody("<img src=\"images/email.svg\" />\n<div>test</div>");
 
-        Vertx
-            .vertx()
-            .runOnContext(event ->
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        Vertx.vertx().runOnContext(event ->
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        try {
-                            assertThat(GreenMailUtil.getBody(receivedMessage)).contains("Content-ID:");
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow())
-            );
+                    try {
+                        assertThat(GreenMailUtil.getBody(receivedMessage)).contains("Content-ID:");
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow())
+        );
 
         awaitCompletionAndCheckFailure();
     }
@@ -171,27 +167,25 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
     void shouldSendEmailWithInvalidImage() {
         emailNotifierConfiguration.setBody("<img src=\"../../../../../images/email.svg\" />\n<div>test</div>");
 
-        Vertx
-            .vertx()
-            .runOnContext(event ->
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        Vertx.vertx().runOnContext(event ->
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        try {
-                            assertThat(GreenMailUtil.getBody(receivedMessage)).doesNotContain("Content-ID:");
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                    try {
+                        assertThat(GreenMailUtil.getBody(receivedMessage)).doesNotContain("Content-ID:");
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(1);
 
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow())
-            );
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow())
+        );
 
         awaitCompletionAndCheckFailure();
     }
@@ -201,42 +195,39 @@ class EmailNotifierTest extends AbstractEmailNotifierTest {
     void shouldSendEmailWithNewLine() {
         emailNotifierConfiguration.setBody("A test \n with \n new \n line\n");
 
-        Vertx
-            .vertx()
-            .runOnContext(event ->
-                emailNotifier
-                    .send(notification, parameters)
-                    .whenComplete((unused, throwable) -> {
-                        assertThat(greenMail.getReceivedMessages()).hasSize(1);
-                        MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
+        Vertx.vertx().runOnContext(event ->
+            emailNotifier
+                .send(notification, parameters)
+                .whenComplete((unused, throwable) -> {
+                    assertThat(greenMail.getReceivedMessages()).hasSize(1);
+                    MimeMessage receivedMessage = greenMail.getReceivedMessages()[0];
 
-                        try {
-                            assertThat(GreenMailUtil.getBody(receivedMessage))
-                                .isEqualTo(
-                                    """
-                                            <html>\r
-                                             <head></head>\r
-                                             <body>\r
-                                              A test\r
-                                              <br>\r
-                                              with\r
-                                              <br>\r
-                                              new\r
-                                              <br>\r
-                                              line\r
-                                              <br>\r
-                                             </body>\r
-                                            </html>"""
-                                );
-                            assertThat(receivedMessage.getAllRecipients()).hasSize(1);
-                            assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
-                            assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
-                        } catch (MessagingException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .whenComplete(completeOrFailNow())
-            );
+                    try {
+                        assertThat(GreenMailUtil.getBody(receivedMessage)).isEqualTo(
+                            """
+                            <html>\r
+                             <head></head>\r
+                             <body>\r
+                              A test\r
+                              <br>\r
+                              with\r
+                              <br>\r
+                              new\r
+                              <br>\r
+                              line\r
+                              <br>\r
+                             </body>\r
+                            </html>"""
+                        );
+                        assertThat(receivedMessage.getAllRecipients()).hasSize(1);
+                        assertThat(receivedMessage.getAllRecipients()[0]).hasToString("to@mail.com");
+                        assertThat(receivedMessage.getSubject()).isEqualTo("subject of email");
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .whenComplete(completeOrFailNow())
+        );
 
         awaitCompletionAndCheckFailure();
     }
