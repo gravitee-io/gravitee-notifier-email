@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/2.0.0...3.0.0) (2026-03-16)
+
+
+### chore
+
+* update project configuration ([c7f7b64](https://github.com/gravitee-io/gravitee-notifier-email/commit/c7f7b64f9a76bc85d4e34fd8e1c551bacfd4ae82))
+
+
+### BREAKING CHANGES
+
+* notifier-api 2.0.0
+
 # [2.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/1.5.2...2.0.0) (2025-06-20)
 
 
