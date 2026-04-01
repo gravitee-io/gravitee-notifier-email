@@ -1,3 +1,17 @@
+# [4.0.0-alpha.1](https://github.com/gravitee-io/gravitee-notifier-email/compare/3.0.0...4.0.0-alpha.1) (2026-04-01)
+
+
+### Features
+
+* bump orb version ([7df1ec8](https://github.com/gravitee-io/gravitee-notifier-email/commit/7df1ec83dbb78916a0c1f56fbc7e3d5ed96a4b7e))
+* bumped AM version to 4.12.0-alpha.1 ([83ad764](https://github.com/gravitee-io/gravitee-notifier-email/commit/83ad7645bdb1cb2661784f3684f7c5710418b303))
+* vertx 5 upgrade, BREAKING CHANGES ([da034e7](https://github.com/gravitee-io/gravitee-notifier-email/commit/da034e7b68471c2eb25a6e5ca5a60fd58a6e0b83))
+
+
+### BREAKING CHANGES
+
+* JDK 25
+
 # [3.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/2.0.0...3.0.0) (2026-03-16)
 
 
