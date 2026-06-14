@@ -40,7 +40,7 @@
         <gravitee-node.version>8.0.5</gravitee-node.version>
 
         <freemarker.version>2.3.34</freemarker.version>
-        <greenmail-junit5.version>2.1.8</greenmail-junit5.version>
+        <greenmail-junit5.version>2.1.9</greenmail-junit5.version>
         <jakarta.activation.version>2.0.1</jakarta.activation.version>
         <jsoup.version>1.22.1</jsoup.version>
 
