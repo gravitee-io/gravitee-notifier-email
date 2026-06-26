@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/gravitee-io/gravitee-notifier-email/compare/4.0.0...4.0.1) (2026-06-26)
+
+
+### Bug Fixes
+
+* closed mailClient after mail has been sent ([2ae032d](https://github.com/gravitee-io/gravitee-notifier-email/commit/2ae032db4497ece3bb58fd6f004b76363c546fb6))
+
 # [4.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/3.0.0...4.0.0) (2026-06-26)
 
 
