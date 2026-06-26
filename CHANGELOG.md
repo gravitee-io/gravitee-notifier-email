@@ -1,3 +1,20 @@
+# [4.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/3.0.0...4.0.0) (2026-06-26)
+
+
+* feat!: upgrade to Vert.x 5 ([19aef59](https://github.com/gravitee-io/gravitee-notifier-email/commit/19aef5979449394b71d7f514f86eb33dd715ad12))
+
+
+### BREAKING CHANGES
+
+* migrate the email notifier to Vert.x 5.
+
+Align Gravitee dependencies to released versions:
+- gravitee-bom: 9.0.0
+- gravitee-common: 5.0.0
+- gravitee-node: 9.0.0
+- gravitee-notifier-api: 2.0.0
+- gravitee-parent: 24.0.2 (keep Java 21 baseline, do not compile in Java 25)
+
 # [3.0.0](https://github.com/gravitee-io/gravitee-notifier-email/compare/2.0.0...3.0.0) (2026-03-16)
 
 
