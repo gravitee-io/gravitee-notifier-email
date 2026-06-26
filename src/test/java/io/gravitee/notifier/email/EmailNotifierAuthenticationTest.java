@@ -111,16 +111,17 @@ class EmailNotifierAuthenticationTest extends AbstractEmailNotifierTest {
         emailNotifierConfiguration.setUsername("user");
         emailNotifierConfiguration.setPassword("bad-password");
 
-        Vertx.vertx().runOnContext(event -> {
+        Vertx.vertx().runOnContext(event ->
             emailNotifier
                 .send(notification, parameters)
-                .whenComplete((unused, throwable) -> {
-                    assertThat(throwable).isNotNull();
-                    assertThat(greenMail.getReceivedMessages()).isEmpty();
-                    testContext.completeNow();
-                })
-                .whenComplete(completeOrFailNow());
-        });
+                .whenComplete((unused, throwable) ->
+                    testContext.verify(() -> {
+                        assertThat(throwable).isNotNull();
+                        assertThat(greenMail.getReceivedMessages()).isEmpty();
+                        testContext.completeNow();
+                    })
+                )
+        );
 
         awaitCompletionAndCheckFailure();
     }
