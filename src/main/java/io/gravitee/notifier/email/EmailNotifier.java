@@ -16,7 +16,6 @@
 package io.gravitee.notifier.email;
 
 import static io.vertx.core.buffer.Buffer.buffer;
-import static io.vertx.ext.mail.MailClient.createShared;
 import static java.lang.String.valueOf;
 import static java.nio.file.Files.readAllBytes;
 import static java.util.Objects.nonNull;
@@ -80,14 +79,17 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
         try {
             final MailMessage mailMessage = prepareMailMessage(parameters);
             final MailConfig mailConfig = prepareMailConfig();
-            createShared(Vertx.currentContext().owner(), mailConfig, valueOf(mailConfig.getHostname().hashCode()))
+            final MailClient mailClient = MailClient.create(Vertx.currentContext().owner(), mailConfig);
+            mailClient
                 .sendMail(mailMessage)
                 .onSuccess(result -> {
                     logger.debug("Email {} has been send successfully!", result.getMessageID());
+                    mailClient.close();
                     future.complete(null);
                 })
                 .onFailure(cause -> {
                     logger.error("An error occurs while sending email", cause);
+                    mailClient.close();
                     future.completeExceptionally(cause);
                 });
         } catch (final Exception ex) {
