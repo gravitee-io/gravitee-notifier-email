@@ -80,18 +80,16 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
         try {
             final MailMessage mailMessage = prepareMailMessage(parameters);
             final MailConfig mailConfig = prepareMailConfig();
-            createShared(Vertx.currentContext().owner(), mailConfig, valueOf(mailConfig.getHostname().hashCode())).sendMail(
-                mailMessage,
-                e -> {
-                    if (e.succeeded()) {
-                        logger.debug("Email {} has been send successfully!", e.result().getMessageID());
-                        future.complete(null);
-                    } else {
-                        logger.error("An error occurs while sending email", e.cause());
-                        future.completeExceptionally(e.cause());
-                    }
-                }
-            );
+            createShared(Vertx.currentContext().owner(), mailConfig, valueOf(mailConfig.getHostname().hashCode()))
+                .sendMail(mailMessage)
+                .onSuccess(result -> {
+                    logger.debug("Email {} has been send successfully!", result.getMessageID());
+                    future.complete(null);
+                })
+                .onFailure(cause -> {
+                    logger.error("An error occurs while sending email", cause);
+                    future.completeExceptionally(cause);
+                });
         } catch (final Exception ex) {
             logger.error("Error while sending email notification", ex);
             future.completeExceptionally(ex);
@@ -141,10 +139,11 @@ public class EmailNotifier extends AbstractConfigurableNotifier<EmailNotifierCon
         }
 
         if (nonNull(configuration.getSslKeyStore())) {
-            mailConfig.setKeyStore(configuration.getSslKeyStore());
-        }
-        if (nonNull(configuration.getSslKeyStorePassword())) {
-            mailConfig.setKeyStorePassword(configuration.getSslKeyStorePassword());
+            var jksOptions = new io.vertx.core.net.JksOptions().setPath(configuration.getSslKeyStore());
+            if (nonNull(configuration.getSslKeyStorePassword())) {
+                jksOptions.setPassword(configuration.getSslKeyStorePassword());
+            }
+            mailConfig.setKeyCertOptions(jksOptions);
         }
 
         if (configuration.isStartTLSEnabled()) {
