@@ -166,3 +166,4 @@ buildNumber.properties
 .mvn/timing.properties
 
 gravitee-notifier-email.iml
+.DS_Store
